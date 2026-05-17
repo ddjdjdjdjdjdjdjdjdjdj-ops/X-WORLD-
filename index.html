@@ -43,7 +43,27 @@
         .copy-btn { background-color: var(--success); color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: 600; }
         
         .single-view { text-align: center; background-color: var(--container-bg); padding: 25px; border-radius: 10px; max-width: 700px; margin: 20px auto; display: none; }
-        .single-view video { width: 100%; border-radius: 8px; background: #000; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+        
+        /* Telegram Player Container Setup */
+        .player-wrapper { 
+            position: relative; 
+            width: 100%; 
+            padding-top: 56.25%; /* 16:9 Cinema Aspect Ratio */
+            background: #000; 
+            border-radius: 8px; 
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            margin-bottom: 15px;
+        }
+        .player-wrapper iframe { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            border: none; 
+        }
+        
         .single-title { font-size: 1.4rem; font-weight: bold; margin-bottom: 15px; text-align: left; }
     </style>
 </head>
@@ -67,7 +87,9 @@
 
     <div id="single-video-panel" class="single-view">
         <div class="single-title" id="single-title-text">Loading Movie Title...</div>
-        <video id="single-video-player" controls controlsList="nodownload"></video>
+        <div class="player-wrapper">
+            <iframe id="single-tg-player" allowfullscreen></iframe>
+        </div>
     </div>
 
     <div id="admin-panel" class="panel">
@@ -79,9 +101,9 @@
         </div>
         
         <div class="form-group">
-            <label>Paste Telegram Video Stream Link (.mp4)</label>
-            <input type="url" id="video-url-input" placeholder="https://telegram-link-bot.mp4/video.mp4">
-            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">টেলিগ্রাম বোট থেকে পাওয়া ডিরেক্ট লিঙ্কটি এখানে পেস্ট করুন।</p>
+            <label>Paste Telegram Post Link</label>
+            <input type="url" id="video-url-input" placeholder="https://t.me/your_channel_username/12">
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">চ্যানেলের ভিডিও পোস্টের লিঙ্কটি (Copy Link করে) সরাসরি এখানে পেস্ট করুন।</p>
         </div>
         
         <button class="btn" id="upload-submit-btn" onclick="publishTelegramLink()">Publish to X WORLD</button>
@@ -123,14 +145,20 @@
         document.getElementById('btn-admin').classList.add('active');
     }
 
-    // টেলিগ্রাম লিঙ্ক ডাটাবেসে সেভ করার মেকানিজম
+    // টেলিগ্রাম লিঙ্ক অটো কনভার্ট ও সেভ করার মেকানিজম
     async function publishTelegramLink() {
         const title = document.getElementById('video-title').value.trim();
-        const videoUrl = document.getElementById('video-url-input').value.trim();
+        let videoUrl = document.getElementById('video-url-input').value.trim();
 
         if (!title || !videoUrl) {
             alert("শান্ত ভাই, টাইটেল এবং ভিডিও লিঙ্ক দুটোই দিন!");
             return;
+        }
+
+        // টেলিগ্রামের নরমাল লিঙ্ককে এম্বেড ফর্মে কনভার্ট করার অটো ফিল্টার
+        if (videoUrl.includes('t.me/') && !videoUrl.includes('?embed=1')) {
+            // যদি লিঙ্কের শেষে স্ল্যাশ বা অন্য কিছু থাকে তা ঠিক করার জন্য
+            videoUrl = videoUrl.split('?')[0] + '?embed=1';
         }
 
         try {
@@ -201,7 +229,9 @@
                 if (snapshot.exists()) {
                     const video = snapshot.val();
                     document.getElementById('single-title-text').innerText = video.title;
-                    document.getElementById('single-video-player').src = video.url;
+                    
+                    // টেলিগ্রাম এম্বেড আইফ্রেমে লিঙ্ক পুশ করা
+                    document.getElementById('single-tg-player').src = video.url;
                     document.getElementById('single-video-panel').style.display = 'block';
                 } else {
                     document.getElementById('single-title-text').innerText = "❌ Video Not Found!";
@@ -215,5 +245,5 @@
     window.onload = checkUrlRoute;
 </script>
 </body>
-    </html>
-                
+                </html>
+    
