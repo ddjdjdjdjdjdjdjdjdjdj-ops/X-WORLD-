@@ -67,7 +67,6 @@
             letter-spacing: 1px;
         }
 
-        /* Nav Tabs - 100% Mobile Responsive Fix */
         .nav-tabs {
             display: flex;
             background: var(--bg-card);
@@ -91,7 +90,6 @@
             font-weight: 700;
             transition: all 0.2s ease;
             text-align: center;
-            white-space: nowrap;
         }
 
         .tab-btn.active {
@@ -100,7 +98,6 @@
             box-shadow: 0 4px 10px rgba(255, 42, 75, 0.25);
         }
 
-        /* Panels */
         .panel {
             display: none;
             background-color: var(--bg-card);
@@ -115,7 +112,6 @@
             display: block;
         }
 
-        /* Form Controls */
         .form-group {
             margin-bottom: 16px;
         }
@@ -136,12 +132,6 @@
             background-color: #0c121c;
             color: var(--text-white);
             font-size: 0.95rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--accent-neon);
         }
 
         .btn {
@@ -154,10 +144,8 @@
             font-size: 0.95rem;
             font-weight: 700;
             cursor: pointer;
-            transition: 0.2s ease;
         }
 
-        /* Link Box */
         .result-box {
             margin-top: 20px;
             padding: 15px;
@@ -188,10 +176,8 @@
             border-radius: 5px;
             cursor: pointer;
             font-weight: 700;
-            font-size: 0.85rem;
         }
 
-        /* Player Screen */
         .single-view {
             width: 100%;
             display: none;
@@ -200,7 +186,6 @@
         .player-container {
             position: relative;
             width: 100%;
-            padding-top: 56.25%; 
             background: #000;
             border-radius: 12px;
             overflow: hidden;
@@ -208,13 +193,18 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .player-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
+        video {
             width: 100%;
-            height: 100%;
+            display: block;
+            max-height: 80vh;
+            background: #000;
+        }
+
+        iframe {
+            width: 100%;
+            height: 450px;
             border: none;
+            display: block;
         }
 
         .video-meta {
@@ -246,7 +236,6 @@
             text-align: center;
             padding: 30px 10px;
             font-size: 0.85rem;
-            line-height: 1.5;
         }
     </style>
 </head>
@@ -271,9 +260,8 @@
     </div>
 
     <div id="single-video-panel" class="single-view">
-        <div class="player-container">
-            <iframe id="premium-core-player" allowfullscreen sandbox="allow-scripts allow-same-origin"></iframe>
-        </div>
+        <div class="player-container" id="player-wrapper">
+            </div>
         <div class="video-meta">
             <div class="video-title-text" id="active-video-title">Loading Secret Stream...</div>
             <span class="video-status-tag">Ultra HD 4K</span>
@@ -289,9 +277,9 @@
         </div>
         
         <div class="form-group">
-            <label>Paste Blogger ID or Code</label>
-            <input type="text" id="video-url-input" placeholder="Paste ID (e.g. 5f3562f1bf389c3b)">
-            <p style="font-size: 0.75rem; color: var(--text-grey); margin-top: 5px;">ব্লগার পোস্টের ভেতর থেকে পাওয়া ছোট আইডি বা পুরো কোডটা এখানে পেস্ট করুন।</p>
+            <label>Paste MP4 URL / Blogger Code / Telegram Link</label>
+            <input type="text" id="video-url-input" placeholder="Paste link or id here...">
+            <p style="font-size: 0.75rem; color: var(--text-grey); margin-top: 5px;">এখানে বোটের দেওয়া লিঙ্ক, সাধারণ ডিরেক্ট .mp4 লিঙ্ক অথবা ব্লগারের আইডি পেস্ট করতে পারেন।</p>
         </div>
         
         <button class="btn" onclick="publishBloggerSecureLink()">Publish Secure Stream</button>
@@ -305,7 +293,6 @@
 </div>
 
 <script>
-    // Firebase Configuration Profile
     const firebaseConfig = {
         apiKey: "AIzaSyBWhYvIKGHfDO4NrH0G5N692FljzD_wmZc",
         authDomain: "misti-am.firebaseapp.com",
@@ -333,32 +320,12 @@
         document.getElementById('btn-admin').classList.add('active');
     }
 
-    function parseCleanId(inputString) {
-        const cleanStr = inputString.trim();
-        if(cleanStr.includes('contentid="')) {
-            const match = cleanStr.match(/contentid="([^"]+)"/);
-            if(match && match[1]) return match[1];
-        }
-        if(cleanStr.includes('id=')) {
-            const urlParams = new URLSearchParams(cleanStr.split('?')[1]);
-            if(urlParams.has('id')) return urlParams.get('id');
-            if(urlParams.has('contentId')) return urlParams.get('contentId');
-        }
-        return cleanStr.replace(/[^a-zA-Z0-9]/g, ""); 
-    }
-
     async function publishBloggerSecureLink() {
         const title = document.getElementById('video-title').value.trim();
         const rawInput = document.getElementById('video-url-input').value.trim();
 
         if (!title || !rawInput) {
-            alert("শান্ত ভাই, টাইটেল এবং আইডি সঠিক ভাবে দিন!");
-            return;
-        }
-
-        const secureContentId = parseCleanId(rawInput);
-        if(!secureContentId || secureContentId.length < 5) {
-            alert("⚠️ আইডি সঠিক নয়, আবার চেক করুন!");
+            alert("শান্ত ভাই, টাইটেল এবং লিঙ্ক সঠিক ভাবে দিন!");
             return;
         }
 
@@ -369,7 +336,7 @@
             await videoRef.set({
                 id: videoId,
                 title: title,
-                contentId: secureContentId,
+                urlData: rawInput,
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             });
 
@@ -430,9 +397,28 @@
                 if (snapshot.exists()) {
                     const video = snapshot.val();
                     document.getElementById('active-video-title').innerText = video.title;
-                    
-                    const targetSecurePlayerUrl = `https://www.blogger.com/video-play.mp4?contentId=${video.contentId}`;
-                    document.getElementById('premium-core-player').src = targetSecurePlayerUrl;
+                    const wrapper = document.getElementById('player-wrapper');
+                    const rawData = video.urlData;
+
+                    // Smart Automation Detection (Telegram / Mp4 / Blogger)
+                    if (rawData.includes('telegram') || rawData.includes('t.me/')) {
+                        let fileId = "";
+                        if(rawData.includes('file=')) {
+                            fileId = rawData.split('file=')[1];
+                        }
+                        // আপনার বোট টোকেন দিয়ে ডিরেক্ট ক্লাউড ফাইল গেটওয়ে তৈরি
+                        const cloudStreamUrl = `https://api.telegram.org/file/bot8967145288:AAFKCNbzlCkp0GvcaUil4FEZ1n37er-RFjM/${fileId}`;
+                        wrapper.innerHTML = `<video src="${cloudStreamUrl}" controls autoplay playsinline controlsList="nodownload" style="width:100%; height:100%; object-fit: contain;"></video>`;
+                    } else if (rawData.includes('.mp4') || rawData.startsWith('http') && !rawData.includes('blogger.com')) {
+                        wrapper.innerHTML = `<video src="${rawData}" controls autoplay playsinline controlsList="nodownload" style="width:100%; height:100%;"></video>`;
+                    } else {
+                        let finalBloggerId = rawData;
+                        if(rawData.includes('contentid="')) {
+                            const match = rawData.match(/contentid="([^"]+)"/);
+                            if(match && match[1]) finalBloggerId = match[1];
+                        }
+                        wrapper.innerHTML = `<iframe src="https://www.blogger.com/video.g?token=${finalBloggerId}" allowfullscreen sandbox="allow-scripts allow-same-origin"></iframe>`;
+                    }
                     
                     document.getElementById('single-video-panel').style.display = 'block';
                 } else {
@@ -447,5 +433,4 @@
     window.onload = checkUrlRoute;
 </script>
 </body>
-    </html>
-    
+</html>
