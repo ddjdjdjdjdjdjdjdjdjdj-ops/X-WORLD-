@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X WORLD - Premium Private Platform</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/patternlock@2.0.2/dist/patternlock.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/patternlock@2.0.2/dist/patternlock.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --container-bg: #1e293b;
+            --accent-color: #ef4444; /* শাক্ত ভাই, ডার্ক থিমের সাথে লাল রঙ জোস লাগবে */
+            --accent-hover: #dc2626;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 30px; padding: 10px 0; border-bottom: 1px solid #334155; }
+        header h1 { font-size: 2.3rem; color: var(--accent-color); letter-spacing: 2px; font-weight: 900; }
+        
+        .nav-tabs { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+        .tab-btn { background: none; border: none; color: var(--text-muted); padding: 10px 20px; font-size: 1rem; cursor: pointer; border-radius: 5px; font-weight: 600; transition: 0.3s; }
+        .tab-btn.active { background-color: var(--accent-color); color: var(--text-main); }
+        
+        .panel { display: none; background-color: var(--container-bg); padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .panel.active { display: block; }
+        
+        /* Pattern Lock Overlay */
+        #lock-screen { display: none; text-align: center; background-color: var(--container-bg); padding: 30px; border-radius: 10px; max-width: 400px; margin: 40px auto; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .patternlock { margin: 20px auto; background: #0f172a; border-radius: 8px; padding: 10px; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: var(--text-muted); font-weight: 600; }
+        .form-group input { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #475569; background-color: #0f172a; color: var(--text-main); font-size: 1rem; }
+        
+        .btn { width: 100%; padding: 14px; background-color: #2563eb; border: none; border-radius: 6px; color: var(--text-main); font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn:hover { background-color: #1d4ed8; }
+        
+        .result-box { margin-top: 20px; padding: 15px; background-color: #0f172a; border-radius: 6px; border: 1px dashed var(--success); display: none; }
+        .share-link { width: 100%; padding: 10px; background: #1e293b; border: 1px solid #334155; color: var(--success); border-radius: 4px; font-family: monospace; margin-bottom: 10px; display: block; }
+        .copy-btn { background-color: var(--success); color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: 600; }
+        
+        .single-view { text-align: center; background-color: var(--container-bg); padding: 25px; border-radius: 10px; max-width: 700px; margin: 20px auto; display: none; }
+        .single-view video { width: 100%; border-radius: 8px; background: #000; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+        .single-title { font-size: 1.4rem; font-weight: bold; margin-bottom: 15px; text-align: left; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>X WORLD</h1>
+        <p id="sub-tag">Secure Video Network</p>
+    </header>
+
+    <div class="nav-tabs" id="nav-container">
+        <button class="tab-btn active" id="btn-gallery" onclick="showGalleryTab()">Main Feed</button>
+        <button class="tab-btn" id="btn-admin" onclick="checkAdminAccess()">Admin Panel</button>
+    </div>
+
+    <div id="user-panel" class="panel active">
+        <p style="color: var(--text-muted); text-align: center; padding: 20px;">X WORLD মেইন হোম পেজ। চ্যানেলের লিঙ্কে ঢুকলে এই লিস্ট কেউ দেখবে না।</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;" id="video-display-grid"></div>
+    </div>
+
+    <div id="lock-screen">
+        <h3 style="color: var(--text-main);">Draw Admin Pattern</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 5px;">প্যানেল আনলক করতে সঠিক প্যাটার্নটি আঁকুন শান্ত ভাই</p>
+        <div id="patternContainer"></div>
+        <p id="lock-error" style="color: var(--error); font-size: 0.9rem; display: none; margin-top: 10px;">❌ ভুল প্যাটার্ন! আবার চেষ্টা করুন।</p>
+    </div>
+
+    <div id="single-video-panel" class="single-view">
+        <div class="single-title" id="single-title-text">Loading Movie Title...</div>
+        <video id="single-video-player" controls controlsList="nodownload"></video>
+    </div>
+
+    <div id="admin-panel" class="panel">
+        <h2 style="margin-bottom: 20px; color: var(--text-main);">Telegram Unlimited Stream Panel</h2>
+        
+        <div class="form-group">
+            <label>Video Title / Name</label>
+            <input type="text" id="video-title" placeholder="Enter video title...">
+        </div>
+        
+        <div class="form-group">
+            <label>Paste Telegram Video Stream Link (.mp4)</label>
+            <input type="url" id="video-url-input" placeholder="https://telegram-link-bot.mp4/video.mp4">
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">টেলিগ্রাম ফাইল-টু-লিঙ্ক বোট থেকে পাওয়া ডিরেক্ট স্ট্রিম লিঙ্কটি এখানে পেস্ট করুন।</p>
+        </div>
+        
+        <button class="btn" id="upload-submit-btn" onclick="publishTelegramLink()">Publish to X WORLD</button>
+        
+        <div class="result-box" id="result-box">
+            <p style="color: var(--success); margin-bottom: 8px;">🎉 Video Saved! Only users with this link can watch:</p>
+            <input type="text" class="share-link" id="generated-link" readonly>
+            <button class="copy-btn" onclick="copyLink()">Copy Private Link</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Shanto's Firebase Configuration (Auto-Linked)
+    const firebaseConfig = {
+        apiKey: "AIzaSyBWhYvIKGHfDO4NrH0G5N692FljzD_wmZc",
+        authDomain: "misti-am.firebaseapp.com",
+        databaseURL: "https://misti-am-default-rtdb.firebaseio.com", // আপনার রিয়েলটাইম ডেটাবেস লিঙ্ক এড করে দেওয়া হয়েছে
+        projectId: "misti-am",
+        storageBucket: "misti-am.firebasestorage.app",
+        messagingSenderId: "335857181187",
+        appId: "1:335857181187:web:eee24712600f7018262436"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // প্যাটার্ন লক সেটিংস (শান্ত ভাইয়ের সিক্রেট কোড)
+    const SECRET_PATTERN = "1235789"; 
+    let isAdminAuthenticated = false;
+
+    function showGalleryTab() {
+        document.getElementById('lock-screen').style.display = 'none';
+        document.getElementById('admin-panel').style.removeProperty('display');
+        document.getElementById('admin-panel').classList.remove('active');
+        document.getElementById('user-panel').classList.add('active');
+        document.getElementById('btn-gallery').classList.add('active');
+        document.getElementById('btn-admin').classList.remove('active');
+    }
+
+    function checkAdminAccess() {
+        if (isAdminAuthenticated) {
+            openAdminPanel();
+        } else {
+            document.getElementById('user-panel').classList.remove('active');
+            document.getElementById('admin-panel').classList.remove('active');
+            document.getElementById('btn-gallery').classList.remove('active');
+            document.getElementById('btn-admin').classList.add('active');
+            document.getElementById('lock-screen').style.display = 'block';
+            
+            var lock = new PatternLock('#patternContainer', {
+                onPattern: function(pattern) {
+                    if (pattern === SECRET_PATTERN) {
+                        isAdminAuthenticated = true;
+                        document.getElementById('lock-screen').style.display = 'none';
+                        document.getElementById('lock-error').style.display = 'none';
+                        openAdminPanel();
+                    } else {
+                        document.getElementById('lock-error').style.display = 'block';
+                        lock.clear();
+                    }
+                }
+            });
+        }
+    }
+
+    function openAdminPanel() {
+        document.getElementById('admin-panel').classList.add('active');
+    }
+
+    // টেলিগ্রাম লিঙ্ক ডাটাবেসে সেভ করার মেকানিজম
+    async function publishTelegramLink() {
+        const title = document.getElementById('video-title').value.trim();
+        const videoUrl = document.getElementById('video-url-input').value.trim();
+
+        if (!title || !videoUrl) {
+            alert("শান্ত ভাই, টাইটেল এবং টেলিগ্রাম ভিডিও লিঙ্ক দুটোই দিন!");
+            return;
+        }
+
+        try {
+            // ফায়ারবেস ডাটাবেসে পুশ করা
+            const videoRef = database.ref('x-world-videos').push();
+            const videoId = videoRef.key;
+
+            await videoRef.set({
+                id: videoId,
+                title: title,
+                url: videoUrl,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
+
+            // ইউনিক প্রাইভেট লিঙ্ক জেনারেট
+            const currentDomain = window.location.origin + window.location.pathname;
+            const privateLink = `${currentDomain}?v=${videoId}`;
+            
+            document.getElementById('generated-link').value = privateLink;
+            document.getElementById('result-box').style.display = 'block';
+            document.getElementById('video-title').value = '';
+            document.getElementById('video-url-input').value = '';
+
+            alert("সফলভাবে সেভ হয়েছে শান্ত ভাই!");
+
+        } catch (error) {
+            alert("Firebase Error: " + error.message);
+        }
+    }
+
+    function copyLink() {
+        const linkInput = document.getElementById('generated-link');
+        linkInput.select();
+        document.execCommand("copy");
+        alert("লিঙ্ক কপি হয়েছে! এটি চ্যানেলে পোস্ট করলে অন্য কেউ বাকি ভিডিও লিস্ট দেখতে পাবে না।");
+    }
+
+    // মেইন গ্যালারিতে ভিডিও লিস্ট লোড করা
+    function loadMainGallery() {
+        const grid = document.getElementById('video-display-grid');
+        database.ref('x-world-videos').orderByChild('timestamp').on('value', (snapshot) => {
+            grid.innerHTML = '';
+            if(!snapshot.exists()) return;
+            
+            snapshot.forEach((child) => {
+                const video = child.val();
+                const currentDomain = window.location.origin + window.location.pathname;
+                const vLink = `${currentDomain}?v=${video.id}`;
+                grid.innerHTML = `
+                    <div style="background:#0f172a; padding:15px; border-radius:8px; border:1px solid #334155; cursor:pointer;" onclick="window.location.search = '?v=${video.id}'">
+                        <div style="width:100%; height:120px; background:#000; border-radius:6px; display:flex; items-center; justify-content:center; align-items:center;">
+                             <span style="color:var(--accent-color); font-size:2rem;">▶</span>
+                        </div>
+                        <p style="margin-top:10px; font-weight:600; font-size:0.95rem; line-clamp: 2;">${video.title}</p>
+                    </div>
+                ` + grid.innerHTML;
+            });
+        });
+    }
+
+    // মেইন রাউটিং এবং সিকিউরিটি চেক
+    function checkUrlRoute() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const videoId = urlParams.get('v');
+
+        if (videoId) {
+            // লিঙ্ক দিয়ে ঢুকলে মেইন লিস্ট, হেডারের সাবটাইটেল এবং নেভিগেশন পুরোপুরি হাইড থাকবে
+            document.getElementById('user-panel').style.display = 'none';
+            document.getElementById('admin-panel').style.display = 'none';
+            document.getElementById('nav-container').style.display = 'none';
+            document.getElementById('sub-tag').style.display = 'none';
+            
+            database.ref('x-world-videos/' + videoId).once('value').then((snapshot) => {
+                if (snapshot.exists()) {
+                    const video = snapshot.val();
+                    document.getElementById('single-title-text').innerText = video.title;
+                    document.getElementById('single-video-player').src = video.url;
+                    document.getElementById('single-video-panel').style.display = 'block';
+                } else {
+                    document.getElementById('single-title-text').innerText = "❌ Video Not Found or Deleted!";
+                }
+            });
+        } else {
+            loadMainGallery();
+        }
+    }
+
+    window.onload = checkUrlRoute;
+</script>
+</body>
+  </html>
+          
