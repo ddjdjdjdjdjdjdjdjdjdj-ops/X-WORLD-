@@ -254,7 +254,7 @@
 
     <div id="user-panel" class="panel active">
         <div class="feed-placeholder">
-            🔒 সিকিউর মোড অ্যাক্টিভেটেড। ডিরেক্ট প্রাইভেট লিঙ্কের মাধ্যমে ভিজিটররা সরাসরি প্রিমিয়াম প্লেয়ারে কন্টেন্ট দেখতে পাবে।
+            🔒 Secure mode activated. Click streams to watch content.
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 15px;" id="video-display-grid"></div>
     </div>
@@ -278,14 +278,13 @@
         
         <div class="form-group">
             <label>Paste MP4 URL / Blogger Code / Telegram Link</label>
-            <input type="text" id="video-url-input" placeholder="Paste link or id here...">
-            <p style="font-size: 0.75rem; color: var(--text-grey); margin-top: 5px;">এখানে বোটের দেওয়া লিঙ্ক, সাধারণ ডিরেক্ট .mp4 লিঙ্ক অথবা ব্লগারের আইডি পেস্ট করতে পারেন।</p>
+            <input type="text" id="video-url-input" placeholder="Paste link here...">
         </div>
         
         <button class="btn" onclick="publishBloggerSecureLink()">Publish Secure Stream</button>
         
         <div class="result-box" id="result-box">
-            <p style="color: var(--success-glow); margin-bottom: 6px; font-weight: 600; font-size: 0.85rem;">🎉 ভিডিও সেভ হয়েছে শান্ত ভাই! শেয়ারিং লিঙ্ক:</p>
+            <p style="color: var(--success-glow); margin-bottom: 6px; font-weight: 600; font-size: 0.85rem;">🎉 Video Saved! Share link:</p>
             <input type="text" class="share-link" id="generated-link" readonly>
             <button class="copy-btn" onclick="copyLink()">Copy Private Link</button>
         </div>
@@ -325,7 +324,7 @@
         const rawInput = document.getElementById('video-url-input').value.trim();
 
         if (!title || !rawInput) {
-            alert("শান্ত ভাই, টাইটেল এবং লিঙ্ক সঠিক ভাবে দিন!");
+            alert("Input field fillup korun!");
             return;
         }
 
@@ -347,9 +346,7 @@
             document.getElementById('result-box').style.display = 'block';
             document.getElementById('video-title').value = '';
             document.getElementById('video-url-input').value = '';
-
-            alert("সফলভাবে প্রিমিয়াম স্ট্রিমে সেভ হয়েছে শান্ত ভাই!");
-
+            alert("Saved Successfully Shanto bhai!");
         } catch (error) {
             alert("Firebase Error: " + error.message);
         }
@@ -359,7 +356,7 @@
         const linkInput = document.getElementById('generated-link');
         linkInput.select();
         document.execCommand("copy");
-        alert("লিঙ্ক কপি হয়েছে!");
+        alert("Copied!");
     }
 
     function loadMainGallery() {
@@ -391,7 +388,6 @@
             document.getElementById('user-panel').style.display = 'none';
             document.getElementById('admin-panel').style.display = 'none';
             document.getElementById('nav-container').style.display = 'none';
-            document.getElementById('main-header').style.marginBottom = '10px';
             
             database.ref('x-world-videos/' + videoId).once('value').then((snapshot) => {
                 if (snapshot.exists()) {
@@ -400,16 +396,16 @@
                     const wrapper = document.getElementById('player-wrapper');
                     const rawData = video.urlData;
 
-                    // Smart Automation Detection (Telegram / Mp4 / Blogger)
                     if (rawData.includes('telegram') || rawData.includes('t.me/')) {
                         let fileId = "";
                         if(rawData.includes('file=')) {
                             fileId = rawData.split('file=')[1];
                         }
-                        // আপনার বোট টোকেন দিয়ে ডিরেক্ট ক্লাউড ফাইল গেটওয়ে তৈরি
-                        const cloudStreamUrl = `https://api.telegram.org/file/bot8967145288:AAFKCNbzlCkp0GvcaUil4FEZ1n37er-RFjM/${fileId}`;
-                        wrapper.innerHTML = `<video src="${cloudStreamUrl}" controls autoplay playsinline controlsList="nodownload" style="width:100%; height:100%; object-fit: contain;"></video>`;
-                    } else if (rawData.includes('.mp4') || rawData.startsWith('http') && !rawData.includes('blogger.com')) {
+                        // Telegram Direct Stream Engine Server (CORS Network Bypass)
+                        const directPlayUrl = `https://cors-anywhere.herokuapp.com/https://api.telegram.org/file/bot8967145288:AAFKCNbzlCkp0GvcaUil4FEZ1n37er-RFjM/${fileId}`;
+                        
+                        wrapper.innerHTML = `<video src="${directPlayUrl}" controls autoplay playsinline controlsList="nodownload" style="width:100%; height:100%; object-fit: contain;" type="video/mp4" onerror="alert('Stream loading error, please check proxy status.')"></video>`;
+                    } else if (rawData.includes('.mp4') || (rawData.startsWith('http') && !rawData.includes('blogger.com'))) {
                         wrapper.innerHTML = `<video src="${rawData}" controls autoplay playsinline controlsList="nodownload" style="width:100%; height:100%;"></video>`;
                     } else {
                         let finalBloggerId = rawData;
@@ -419,10 +415,7 @@
                         }
                         wrapper.innerHTML = `<iframe src="https://www.blogger.com/video.g?token=${finalBloggerId}" allowfullscreen sandbox="allow-scripts allow-same-origin"></iframe>`;
                     }
-                    
                     document.getElementById('single-video-panel').style.display = 'block';
-                } else {
-                    document.getElementById('active-video-title').innerText = "❌ 404 - Video Stream Expired!";
                 }
             });
         } else {
@@ -433,4 +426,5 @@
     window.onload = checkUrlRoute;
 </script>
 </body>
-</html>
+    </html>
+                                          
