@@ -19,9 +19,9 @@
             --error: #ef4444;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); padding: 20px; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding: 15px; }
         .container { max-width: 800px; margin: 0 auto; }
-        header { text-align: center; margin-bottom: 30px; padding: 10px 0; border-bottom: 1px solid #334155; }
+        header { text-align: center; margin-bottom: 25px; padding: 10px 0; border-bottom: 1px solid #334155; }
         header h1 { font-size: 2.3rem; color: var(--accent-color); letter-spacing: 2px; font-weight: 900; }
         
         .nav-tabs { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 1px solid #334155; padding-bottom: 10px; }
@@ -42,13 +42,12 @@
         .share-link { width: 100%; padding: 10px; background: #1e293b; border: 1px solid #334155; color: var(--success); border-radius: 4px; font-family: monospace; margin-bottom: 10px; display: block; }
         .copy-btn { background-color: var(--success); color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: 600; }
         
-        .single-view { text-align: center; background-color: var(--container-bg); padding: 25px; border-radius: 10px; max-width: 700px; margin: 20px auto; display: none; }
-        
-        /* Telegram Player Container Setup */
+        /* ১০০% ফুল-স্ক্রিন রেসপন্সিভ প্লেয়ার সেটআপ */
+        .single-view { background-color: var(--container-bg); padding: 15px; border-radius: 10px; max-width: 100%; margin: 10px auto; display: none; }
         .player-wrapper { 
             position: relative; 
             width: 100%; 
-            padding-top: 56.25%; /* 16:9 Cinema Aspect Ratio */
+            height: 75vh; /* ফোনের স্ক্রিনের ৭৫% জায়গা জুড়ে লম্বালম্বি বড় হবে */
             background: #000; 
             border-radius: 8px; 
             overflow: hidden;
@@ -64,7 +63,7 @@
             border: none; 
         }
         
-        .single-title { font-size: 1.4rem; font-weight: bold; margin-bottom: 15px; text-align: left; }
+        .single-title { font-size: 1.4rem; font-weight: bold; margin-bottom: 15px; text-align: left; color: var(--text-main); }
     </style>
 </head>
 <body>
@@ -103,7 +102,7 @@
         <div class="form-group">
             <label>Paste Telegram Post Link</label>
             <input type="url" id="video-url-input" placeholder="https://t.me/your_channel_username/12">
-            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">চ্যানেলের ভিডিও পোস্টের লিঙ্কটি (Copy Link করে) সরাসরি এখানে পেস্ট করুন।</p>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">চ্যানেলের ভিডিও পোস্টের লিঙ্কটি সরাসরি এখানে পেস্ট করুন।</p>
         </div>
         
         <button class="btn" id="upload-submit-btn" onclick="publishTelegramLink()">Publish to X WORLD</button>
@@ -145,7 +144,6 @@
         document.getElementById('btn-admin').classList.add('active');
     }
 
-    // টেলিগ্রাম লিঙ্ক অটো কনভার্ট ও সেভ করার মেকানিজম
     async function publishTelegramLink() {
         const title = document.getElementById('video-title').value.trim();
         let videoUrl = document.getElementById('video-url-input').value.trim();
@@ -155,9 +153,7 @@
             return;
         }
 
-        // টেলিগ্রামের নরমাল লিঙ্ককে এম্বেড ফর্মে কনভার্ট করার অটো ফিল্টার
         if (videoUrl.includes('t.me/') && !videoUrl.includes('?embed=1')) {
-            // যদি লিঙ্কের শেষে স্ল্যাশ বা অন্য কিছু থাকে তা ঠিক করার জন্য
             videoUrl = videoUrl.split('?')[0] + '?embed=1';
         }
 
@@ -194,7 +190,6 @@
         alert("লিঙ্ক কপি হয়েছে!");
     }
 
-    // মেইন গ্যালারিতে ভিডিও লিস্ট লোড করা
     function loadMainGallery() {
         const grid = document.getElementById('video-display-grid');
         database.ref('x-world-videos').orderByChild('timestamp').on('value', (snapshot) => {
@@ -229,8 +224,6 @@
                 if (snapshot.exists()) {
                     const video = snapshot.val();
                     document.getElementById('single-title-text').innerText = video.title;
-                    
-                    // টেলিগ্রাম এম্বেড আইফ্রেমে লিঙ্ক পুশ করা
                     document.getElementById('single-tg-player').src = video.url;
                     document.getElementById('single-video-panel').style.display = 'block';
                 } else {
@@ -245,5 +238,5 @@
     window.onload = checkUrlRoute;
 </script>
 </body>
-                </html>
-    
+            </html>
+                
