@@ -3,74 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>X WORLD - Premium Private Platform</title>
+    <title>X WORLD - Auto Stream</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
-        :root { --bg-main: #090d16; --bg-card: #131a26; --accent-neon: #ff2a4b; --accent-hover: #cc1b36; --text-white: #ffffff; --text-grey: #94a3b8; --success-glow: #10b981; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-main); color: var(--text-white); padding: 12px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 800px; margin: 0 auto; }
-        header { text-align: center; margin-bottom: 20px; margin-top: 10px; }
-        header h1 { font-size: 2.2rem; font-weight: 900; color: var(--text-white); letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 0 15px rgba(255, 42, 75, 0.5); }
+        :root { --bg-main: #090d16; --bg-card: #131a26; --accent-neon: #ff2a4b; --text-white: #ffffff; --text-grey: #94a3b8; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-white); padding: 15px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 700px; }
+        header { text-align: center; margin-bottom: 25px; }
+        header h1 { font-size: 2.2rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
         header h1 span { color: var(--accent-neon); }
-        header p { color: var(--text-grey); font-size: 0.8rem; margin-top: 4px; letter-spacing: 1px; }
-        .nav-tabs { display: flex; background: var(--bg-card); padding: 4px; border-radius: 10px; gap: 6px; margin-bottom: 20px; border: 1px solid rgba(255, 255, 255, 0.05); width: 100%; }
-        .tab-btn { flex: 1; background: none; border: none; color: var(--text-grey); padding: 10px 5px; font-size: 0.85rem; cursor: pointer; border-radius: 7px; font-weight: 700; text-align: center; }
-        .tab-btn.active { background-color: var(--accent-neon); color: var(--text-white); box-shadow: 0 4px 10px rgba(255, 42, 75, 0.25); }
-        .panel { display: none; background-color: var(--bg-card); padding: 20px; border-radius: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid rgba(255, 255, 255, 0.03); width: 100%; }
-        .panel.active { display: block; }
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; margin-bottom: 8px; color: var(--text-white); font-weight: 600; font-size: 0.9rem; }
-        .form-group input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #2e3d52; background-color: #0c121c; color: var(--text-white); font-size: 0.95rem; }
-        .btn { width: 100%; padding: 14px; background: linear-gradient(90deg, var(--accent-neon), var(--accent-hover)); border: none; border-radius: 8px; color: var(--text-white); font-size: 0.95rem; font-weight: 700; cursor: pointer; }
-        .result-box { margin-top: 20px; padding: 15px; background-color: #0c121c; border-radius: 10px; border: 1px dashed var(--success-glow); display: none; }
-        .share-link { width: 100%; padding: 10px; background: var(--bg-card); border: 1px solid #2e3d52; color: var(--success-glow); border-radius: 6px; font-family: monospace; font-size: 0.85rem; margin-bottom: 10px; display: block; }
-        .copy-btn { background-color: var(--success-glow); color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-weight: 700; }
-        .single-view { width: 100%; display: none; }
-        .player-container { position: relative; width: 100%; background: #000; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.7); border: 1px solid rgba(255, 255, 255, 0.05); height: 450px; }
-        iframe { width: 100%; height: 100%; border: none; display: block; }
-        video { width: 100%; height: 100%; display: block; background: #000; }
-        .video-meta { margin-top: 15px; padding: 5px; }
-        .video-title-text { font-size: 1.3rem; font-weight: 700; color: var(--text-white); line-height: 1.3; }
-        .video-status-tag { display: inline-block; background: rgba(255, 42, 75, 0.1); color: var(--accent-neon); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; margin-top: 6px; text-transform: uppercase; }
-        .feed-placeholder { color: var(--text-grey); text-align: center; padding: 30px 10px; font-size: 0.85rem; }
+        .feed-title { font-size: 1.1rem; margin-bottom: 15px; font-weight: 600; color: var(--text-grey); }
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .video-card { background: var(--bg-card); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: 0.2s; }
+        .video-card:hover { border-color: var(--accent-neon); }
+        .thumbnail { width: 100%; height: 110px; background: #000; border-radius: 6px; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(255,42,75,0.1); }
+        .thumbnail span { color: var(--accent-neon); font-size: 1.5rem; }
+        .v-title { margin-top: 8px; font-weight: 600; font-size: 0.85rem; color: var(--text-white); overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; min-height: 34px; }
+        .share-btn { margin-top: 8px; width: 100%; background: #1e293b; border: none; color: #38bdf8; padding: 7px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer; }
+        .single-view { display: none; width: 100%; }
+        .player-box { width: 100%; background: #000; border-radius: 12px; overflow: hidden; height: 430px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); border: 1px solid rgba(255, 255, 255, 0.05); }
+        iframe, video { width: 100%; height: 100%; border: none; display: block; }
+        .meta-box { margin-top: 15px; }
+        .active-title { font-size: 1.2rem; font-weight: 700; color: var(--text-white); }
+        .back-btn { display: inline-block; background: var(--accent-neon); color: #fff; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; text-decoration: none; margin-bottom: 15px; cursor: pointer; }
     </style>
 </head>
 <body>
 <div class="container">
-    <header id="main-header">
-        <h1>X <span>WORLD</span></h1>
-        <p id="sub-tag">PREMIUM PRIVATE PLATFORM</p>
-    </header>
-    <div class="nav-tabs" id="nav-container">
-        <button class="tab-btn active" id="btn-gallery" onclick="showGalleryTab()">Main Feed</button>
-        <button class="tab-btn" id="btn-admin" onclick="showAdminTab()">Admin Panel</button>
+    <header><h1>X <span>WORLD</span></h1></header>
+
+    <div id="main-view">
+        <div class="feed-title">Latest Telegram Streams</div>
+        <div class="video-grid" id="video-grid"></div>
     </div>
-    <div id="user-panel" class="panel active">
-        <div class="feed-placeholder">🔒 Secure streaming mode active. Click a stream to watch.</div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 15px;" id="video-display-grid"></div>
-    </div>
-    <div id="single-video-panel" class="single-view">
-        <div class="player-container" id="player-wrapper"></div>
-        <div class="video-meta">
-            <div class="video-title-text" id="active-video-title">Loading Secret Stream...</div>
-            <span class="video-status-tag">Ultra HD 4K</span>
-        </div>
-    </div>
-    <div id="admin-panel" class="panel">
-        <h3 style="margin-bottom: 15px; font-weight: 700; font-size: 1.1rem; color: var(--accent-neon);">Upload To Private Gateway</h3>
-        <div class="form-group"><label>Stream Title / Name</label><input type="text" id="video-title" placeholder="e.g. Premium Secret Video 01"></div>
-        <div class="form-group"><label>Paste MP4 URL / Blogger Code / Telegram Link</label><input type="text" id="video-url-input" placeholder="Paste link here..."></div>
-        <button class="btn" onclick="publishBloggerSecureLink()">Publish Secure Stream</button>
-        <div class="result-box" id="result-box">
-            <p style="color: var(--success-glow); margin-bottom: 6px; font-weight: 600; font-size: 0.85rem;">🎉 Video Saved! Share link:</p>
-            <input type="text" class="share-link" id="generated-link" readonly>
-            <button class="copy-btn" onclick="copyLink()">Copy Private Link</button>
+
+    <div id="player-view" class="single-view">
+        <div class="back-btn" onclick="window.location.search=''">← Back to Feed</div>
+        <div class="player-box" id="player-container"></div>
+        <div class="meta-box">
+            <div class="active-title" id="video-display-title">Loading Stream...</div>
         </div>
     </div>
 </div>
+
 <script>
     const firebaseConfig = {
         apiKey: "AIzaSyBWhYvIKGHfDO4NrH0G5N692FljzD_wmZc",
@@ -84,66 +62,70 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    function showGalleryTab() { document.getElementById('admin-panel').classList.remove('active'); document.getElementById('user-panel').classList.add('active'); document.getElementById('btn-gallery').classList.add('active'); document.getElementById('btn-admin').classList.remove('active'); }
-    function showAdminTab() { document.getElementById('user-panel').classList.remove('active'); document.getElementById('admin-panel').classList.add('active'); document.getElementById('btn-gallery').classList.remove('active'); document.getElementById('btn-admin').classList.add('active'); }
-
-    async function publishBloggerSecureLink() {
-        const title = document.getElementById('video-title').value.trim();
-        const rawInput = document.getElementById('video-url-input').value.trim();
-        if (!title || !rawInput) { alert("সবগুলো ঘর পূরণ করুন শান্ত ভাই!"); return; }
-        try {
-            const videoRef = database.ref('x-world-videos').push();
-            const videoId = videoRef.key;
-            await videoRef.set({ id: videoId, title: title, urlData: rawInput, timestamp: firebase.database.ServerValue.TIMESTAMP });
-            const privateLink = `${window.location.origin}${window.location.pathname}?v=${videoId}`;
-            document.getElementById('generated-link').value = privateLink;
-            document.getElementById('result-box').style.display = 'block';
-            alert("সফলভাবে সেভ হয়েছে শান্ত ভাই!");
-        } catch (error) { alert("Firebase Error: " + error.message); }
-    }
-
-    function copyLink() { const linkInput = document.getElementById('generated-link'); linkInput.select(); document.execCommand("copy"); alert("Copied!"); }
-
-    function loadMainGallery() {
-        const grid = document.getElementById('video-display-grid');
+    function loadGrid() {
         database.ref('x-world-videos').orderByChild('timestamp').on('value', (snapshot) => {
+            const grid = document.getElementById('video-grid');
+            grid.innerHTML = '';
             if(!snapshot.exists()) return;
-            grid.innerHTML = ''; document.querySelector('.feed-placeholder').style.display = 'none';
+            
             snapshot.forEach((child) => {
                 const video = child.val();
-                grid.innerHTML = `<div style="background:var(--bg-card); padding:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.05); cursor:pointer;" onclick="window.location.search = '?v=${video.id}'"><div style="width:100%; height:120px; background:#000; border-radius:6px; display:flex; justify-content:center; align-items:center; border: 1px solid rgba(255,42,75,0.1)"><span style="color:var(--accent-neon); font-size:1.8rem;">▶</span></div><p style="margin-top:8px; font-weight:600; font-size:0.9rem; color:var(--text-white);">${video.title}</p></div>` + grid.innerHTML;
+                const shareLink = `${window.location.origin}${window.location.pathname}?v=${child.key}`;
+                
+                const card = document.createElement('div');
+                card.className = 'video-card';
+                card.innerHTML = `
+                    <div onclick="window.location.search = '?v=${child.key}'">
+                        <div class="thumbnail"><span>▶</span></div>
+                        <p class="v-title">${video.title}</p>
+                    </div>
+                    <button class="share-btn" onclick="copyShareLink(event, '${shareLink}')">🔗 Copy Video Link</button>
+                `;
+                grid.insertBefore(card, grid.firstChild);
             });
         });
     }
 
-    function checkUrlRoute() {
+    function copyShareLink(e, link) {
+        e.stopPropagation();
+        navigator.clipboard.writeText(link).then(() => {
+            alert("ইউনিক শেয়ারিং লিংক কপি হয়েছে শান্ত ভাই!");
+        });
+    }
+
+    function handleRouting() {
         const urlParams = new URLSearchParams(window.location.search);
         const videoId = urlParams.get('v');
+        
         if (videoId) {
-            document.getElementById('user-panel').style.display = 'none'; document.getElementById('admin-panel').style.display = 'none'; document.getElementById('nav-container').style.display = 'none';
+            document.getElementById('main-view').style.display = 'none';
+            document.getElementById('player-view').style.display = 'block';
+            
             database.ref('x-world-videos/' + videoId).once('value').then((snapshot) => {
                 if (snapshot.exists()) {
                     const video = snapshot.val();
-                    document.getElementById('active-video-title').innerText = video.title;
-                    const wrapper = document.getElementById('player-wrapper');
-                    const rawData = video.urlData;
-
-                    if (rawData.includes('iv?url=')) {
-                        // টেলিগ্রামের অফিশিয়াল ওয়েব এমবেড প্লেয়ার
-                        wrapper.innerHTML = `<iframe src="${rawData}" allowfullscreen allow="autoplay"></iframe>`;
-                    } else if (rawData.includes('.mp4') || (rawData.startsWith('http') && !rawData.includes('blogger.com'))) {
-                        wrapper.innerHTML = `<video src="${rawData}" controls autoplay playsinline style="width:100%; height:100%;"></video>`;
+                    document.getElementById('video-display-title').innerText = video.title;
+                    
+                    // লিংক প্রোটোকল অনুযায়ী বেস্ট প্লেয়ার লোড করা
+                    if(video.urlData.includes('t.me')) {
+                        document.getElementById('player-container').innerHTML = `
+                            <iframe src="${video.urlData}" frameborder="0" scrolling="no" allowfullscreen></iframe>
+                        `;
                     } else {
-                        let finalBloggerId = rawData;
-                        if(rawData.includes('contentid="')) { const match = rawData.match(/contentid="([^"]+)"/); if(match && match[1]) finalBloggerId = match[1]; }
-                        wrapper.innerHTML = `<iframe src="https://www.blogger.com/video.g?token=${finalBloggerId}" allowfullscreen></iframe>`;
+                        document.getElementById('player-container').innerHTML = `
+                            <video src="${video.urlData}" controls autoplay playsinline></video>
+                        `;
                     }
-                    document.getElementById('single-video-panel').style.display = 'block';
+                } else {
+                    alert("ভিডিওটি ডাটাবেজে পাওয়া যায়নি!");
+                    window.location.search = '';
                 }
             });
-        } else { loadMainGallery(); }
+        } else {
+            loadGrid();
+        }
     }
-    window.onload = checkUrlRoute;
+    window.onload = handleRouting;
 </script>
 </body>
 </html>
