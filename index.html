@@ -401,10 +401,13 @@
                         if(rawData.includes('file=')) {
                             fileId = rawData.split('file=')[1];
                         }
-                        // Telegram Direct Stream Engine Server (CORS Network Bypass)
-                        const directPlayUrl = `https://cors-anywhere.herokuapp.com/https://api.telegram.org/file/bot8967145288:AAFKCNbzlCkp0GvcaUil4FEZ1n37er-RFjM/${fileId}`;
                         
-                        wrapper.innerHTML = `<video src="${directPlayUrl}" controls autoplay playsinline controlsList="nodownload" style="width:100%; height:100%; object-fit: contain;" type="video/mp4" onerror="alert('Stream loading error, please check proxy status.')"></video>`;
+                        // ডিরেক্ট ক্লাউড গেটওয়ে (প্রক্সি ছাড়া ১ সেকেন্ডে লোড হবে)
+                        const directPlayUrl = `https://api.telegram.org/file/bot8967145288:AAFKCNbzlCkp0GvcaUil4FEZ1n37er-RFjM/${fileId}`;
+                        
+                        // আইফ্রেম স্ট্রাকচার যাতে ব্রাউজার নেটওয়ার্ক সিকিউরিটি ব্লক না করে
+                        wrapper.innerHTML = `<iframe src="${directPlayUrl}" style="width:100%; height:450px; background:#000;" allow="autoplay" sandbox="allow-scripts allow-same-origin"></iframe>`;
+                        
                     } else if (rawData.includes('.mp4') || (rawData.startsWith('http') && !rawData.includes('blogger.com'))) {
                         wrapper.innerHTML = `<video src="${rawData}" controls autoplay playsinline controlsList="nodownload" style="width:100%; height:100%;"></video>`;
                     } else {
@@ -426,5 +429,4 @@
     window.onload = checkUrlRoute;
 </script>
 </body>
-    </html>
-                                          
+</html>
