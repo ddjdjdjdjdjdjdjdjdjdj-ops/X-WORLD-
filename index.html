@@ -1,131 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>X WORLD - Auto Stream</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <style>
-        :root { --bg-main: #090d16; --bg-card: #131a26; --accent-neon: #ff2a4b; --text-white: #ffffff; --text-grey: #94a3b8; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg-main); color: var(--text-white); padding: 15px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 700px; }
-        header { text-align: center; margin-bottom: 25px; }
-        header h1 { font-size: 2.2rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
-        header h1 span { color: var(--accent-neon); }
-        .feed-title { font-size: 1.1rem; margin-bottom: 15px; font-weight: 600; color: var(--text-grey); }
-        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
-        .video-card { background: var(--bg-card); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: 0.2s; }
-        .video-card:hover { border-color: var(--accent-neon); }
-        .thumbnail { width: 100%; height: 110px; background: #000; border-radius: 6px; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(255,42,75,0.1); }
-        .thumbnail span { color: var(--accent-neon); font-size: 1.5rem; }
-        .v-title { margin-top: 8px; font-weight: 600; font-size: 0.85rem; color: var(--text-white); overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; min-height: 34px; }
-        .share-btn { margin-top: 8px; width: 100%; background: #1e293b; border: none; color: #38bdf8; padding: 7px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer; }
-        .single-view { display: none; width: 100%; }
-        .player-box { width: 100%; background: #000; border-radius: 12px; overflow: hidden; height: 430px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); border: 1px solid rgba(255, 255, 255, 0.05); }
-        iframe, video { width: 100%; height: 100%; border: none; display: block; }
-        .meta-box { margin-top: 15px; }
-        .active-title { font-size: 1.2rem; font-weight: 700; color: var(--text-white); }
-        .back-btn { display: inline-block; background: var(--accent-neon); color: #fff; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; text-decoration: none; margin-bottom: 15px; cursor: pointer; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>X World - Telegram Videos</title>
+  <style>
+    /* পুরো পেজের ব্যাকগ্রাউন্ড কালার ও স্টাইল */
+    body {
+      background-color: #181a1b;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+
+    /* টেলিগ্রাম ফিডের বক্স স্টাইল */
+    .telegram-feed-container {
+      width: 100%;
+      max-width: 600px; /* মোবাইল এবং পিসিতে সুন্দর দেখানোর জন্য */
+      height: 80px; /* নিচের উইজেটের হাইটের সাথে মিল রেখে */
+      border: 1px solid #2f3438;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-    <header><h1>X <span>WORLD</span></h1></header>
 
-    <div id="main-view">
-        <div class="feed-title">Latest Telegram Streams</div>
-        <div class="video-grid" id="video-grid"></div>
-    </div>
+  <h1>X World Video Feed</h1>
 
-    <div id="player-view" class="single-view">
-        <div class="back-btn" onclick="window.location.search=''">← Back to Feed</div>
-        <div class="player-box" id="player-container"></div>
-        <div class="meta-box">
-            <div class="active-title" id="video-display-title">Loading Stream...</div>
-        </div>
-    </div>
-</div>
+  <div class="telegram-feed-container">
+    <!-- Telegram Official Channel Widget for xworld85889 -->
+    <script async src="https://telegram.org/js/telegram-widget.js?22" 
+            data-telegram-channel="xworld85889" 
+            data-width="100%" 
+            data-height="750px" 
+            data-dark="1">
+    </script>
+  </div>
 
-<script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyBWhYvIKGHfDO4NrH0G5N692FljzD_wmZc",
-        authDomain: "misti-am.firebaseapp.com",
-        databaseURL: "https://misti-am-default-rtdb.firebaseio.com", 
-        projectId: "misti-am",
-        storageBucket: "misti-am.firebasestorage.app",
-        messagingSenderId: "335857181187",
-        appId: "1:335857181187:web:eee24712600f7018262436"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-
-    function loadGrid() {
-        database.ref('x-world-videos').orderByChild('timestamp').on('value', (snapshot) => {
-            const grid = document.getElementById('video-grid');
-            grid.innerHTML = '';
-            if(!snapshot.exists()) return;
-            
-            snapshot.forEach((child) => {
-                const video = child.val();
-                const shareLink = `${window.location.origin}${window.location.pathname}?v=${child.key}`;
-                
-                const card = document.createElement('div');
-                card.className = 'video-card';
-                card.innerHTML = `
-                    <div onclick="window.location.search = '?v=${child.key}'">
-                        <div class="thumbnail"><span>▶</span></div>
-                        <p class="v-title">${video.title}</p>
-                    </div>
-                    <button class="share-btn" onclick="copyShareLink(event, '${shareLink}')">🔗 Copy Video Link</button>
-                `;
-                grid.insertBefore(card, grid.firstChild);
-            });
-        });
-    }
-
-    function copyShareLink(e, link) {
-        e.stopPropagation();
-        navigator.clipboard.writeText(link).then(() => {
-            alert("ইউনিক শেয়ারিং লিংক কপি হয়েছে শান্ত ভাই!");
-        });
-    }
-
-    function handleRouting() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const videoId = urlParams.get('v');
-        
-        if (videoId) {
-            document.getElementById('main-view').style.display = 'none';
-            document.getElementById('player-view').style.display = 'block';
-            
-            database.ref('x-world-videos/' + videoId).once('value').then((snapshot) => {
-                if (snapshot.exists()) {
-                    const video = snapshot.val();
-                    document.getElementById('video-display-title').innerText = video.title;
-                    
-                    // লিংক প্রোটোকল অনুযায়ী বেস্ট প্লেয়ার লোড করা
-                    if(video.urlData.includes('t.me')) {
-                        document.getElementById('player-container').innerHTML = `
-                            <iframe src="${video.urlData}" frameborder="0" scrolling="no" allowfullscreen></iframe>
-                        `;
-                    } else {
-                        document.getElementById('player-container').innerHTML = `
-                            <video src="${video.urlData}" controls autoplay playsinline></video>
-                        `;
-                    }
-                } else {
-                    alert("ভিডিওটি ডাটাবেজে পাওয়া যায়নি!");
-                    window.location.search = '';
-                }
-            });
-        } else {
-            loadGrid();
-        }
-    }
-    window.onload = handleRouting;
-</script>
 </body>
 </html>
